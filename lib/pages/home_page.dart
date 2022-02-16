@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_cubit/cubit/app_cubit_state.dart';
+import 'package:flutter_cubit/cubit/app_cubits.dart';
 import 'package:flutter_cubit/misc/colors.dart';
 import 'package:flutter_cubit/widgets/app_large_text.dart';
 import 'package:flutter_cubit/widgets/app_text.dart';
@@ -23,150 +26,166 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     TabController _tabController = TabController(length: 3, vsync: this);
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 15, left: 20, right: 20),
-              child: Row(
+        body: BlocBuilder<AppCubits, CubitStates>(
+          builder: (context, state) {
+            if (state is LoadedState) {
+              var info = state.places;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.menu,
-                    size: 30,
-                    color: Colors.black54,
-                  ),
-                  Expanded(child: Container()),
                   Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(10)),
+                    margin: EdgeInsets.only(top: 15, left: 20, right: 20),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.menu,
+                          size: 30,
+                          color: Colors.black54,
+                        ),
+                        Expanded(child: Container()),
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 20),
-              child: AppLargeText(text: "Discover"),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Container(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: TabBar(
-                    labelPadding:
-                        EdgeInsets.only(left: 20, right: 20, bottom: 0, top: 0),
-                    controller: _tabController,
-                    labelColor: Colors.black,
-                    unselectedLabelColor: Colors.grey,
-                    isScrollable: true,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    indicator: CircleTabIndicator(
-                        color: AppColors.mainColor, radius: 4),
-                    tabs: const [
-                      Tab(
-                        text: "Places",
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 20),
+                    child: AppLargeText(text: "Discover"),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TabBar(
+                          labelPadding: EdgeInsets.only(
+                              left: 20, right: 20, bottom: 0, top: 0),
+                          controller: _tabController,
+                          labelColor: Colors.black,
+                          unselectedLabelColor: Colors.grey,
+                          isScrollable: true,
+                          indicatorSize: TabBarIndicatorSize.label,
+                          indicator: CircleTabIndicator(
+                              color: AppColors.mainColor, radius: 4),
+                          tabs: const [
+                            Tab(
+                              text: "Places",
+                            ),
+                            Tab(
+                              text: "Inspiration",
+                            ),
+                            Tab(
+                              text: "Emotions",
+                            )
+                          ]),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 20),
+                    height: 300,
+                    width: double.maxFinite,
+                    child: TabBarView(controller: _tabController, children: [
+                      ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: info.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              BlocProvider.of<AppCubits>(context).detailState(info[index]);
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(right: 15, top: 10),
+                              width: 200,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        "http://mark.bslmeiyu.com/uploads/" +
+                                            info[index].img),
+                                    fit: BoxFit.cover),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                      Tab(
-                        text: "Inspiration",
-                      ),
-                      Tab(
-                        text: "Emotions",
-                      )
+                      AppText(text: "Hi"),
+                      AppText(text: "Bye Bye")
                     ]),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              height: 300,
-              width: double.maxFinite,
-              child: TabBarView(controller: _tabController, children: [
-                ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: EdgeInsets.only(right: 15, top: 10),
-                      width: 200,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("img/mountain.jpeg"),
-                            fit: BoxFit.cover),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    );
-                  },
-                ),
-                AppText(text: "Hi"),
-                AppText(text: "Bye Bye")
-              ]),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 20, right: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  AppLargeText(
-                    text: "Explore More",
-                    size: 22,
                   ),
-                  AppText(
-                    text: "see all",
-                    color: AppColors.textColor1,
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AppLargeText(
+                          text: "Explore More",
+                          size: 22,
+                        ),
+                        AppText(
+                          text: "see all",
+                          color: AppColors.textColor1,
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 20, top: 10),
+                    height: 150,
+                    child: ListView.builder(
+                        itemCount: 4,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (_, index) {
+                          return Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage("img/" +
+                                            images.keys.elementAt(index)),
+                                        fit: BoxFit.cover),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Container(
+                                    child: AppText(
+                                  text: images.values.elementAt(index),
+                                  color: AppColors.textColor2,
+                                ))
+                              ],
+                            ),
+                          );
+                        }),
                   )
                 ],
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 20, top: 10),
-              height: 150,
-              child: ListView.builder(
-                  itemCount: 4,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (_, index) {
-                    return Container(
-                      margin: EdgeInsets.only(right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                      "img/" + images.keys.elementAt(index)),
-                                  fit: BoxFit.cover),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                              child: AppText(
-                            text: images.values.elementAt(index),
-                            color: AppColors.textColor2,
-                          ))
-                        ],
-                      ),
-                    );
-                  }),
-            )
-          ],
+              );
+            } else {
+              return Container();
+            }
+          },
         ),
       ),
     );

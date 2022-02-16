@@ -14,7 +14,7 @@ class AppButton extends StatelessWidget {
   AppButton(
       {Key? key,
       this.isIcon = false,
-      this.text,
+      this.text = "Hi",
       this.icon,
       required this.size,
       required this.color,
@@ -31,18 +31,18 @@ class AppButton extends StatelessWidget {
       decoration: BoxDecoration(
           border: Border.all(color: borderColor),
           borderRadius: BorderRadius.circular(15),
-          color: color),
+          color: backgroundColor),
       child: isIcon == false
           ? Center(
               child: AppText(
                 text: text!,
-                color: Colors.black,
+                color: color,
               ),
             )
           : Center(
               child: Icon(
                 icon,
-                color: Colors.black,
+                color: color
               ),
             ),
     );
